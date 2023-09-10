@@ -1,0 +1,53 @@
+---
+title: "FML_ASSIGNEMENT_001"
+author: "Shreya Thodupunuri"
+date: "2023-09-10"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+##Assignment-1
+##FML
+##Shreya Thodupunuri-811301506
+
+data("iris")
+View(iris)
+
+#The following are the Statistical Measures.
+
+#Mean
+mean(iris$Sepal.Length)
+
+#Median
+median(iris$Sepal.Length)
+
+#Mode
+mode<-function(x){
+  n<-table(iris)
+  which.max(n)
+}
+
+mode(iris$Sepal.Length)
+
+#Variance
+var(iris$Sepal.Length)
+
+#Range
+range(iris$Sepal.Length)
+
+#Standard Deviation
+sd(iris$Sepal.Length)
+
+#Histogram
+hist(iris$Sepal.Length,main = "Histogram of Iris Sepal Lenght",xlab = "Values",ylab = "Measure")
+
+#Scatter Plot
+x = iris$Sepal.Length
+y = iris$Sepal.Width
+plot(x,y, main = " IRIS", xlab = "Value of Iris Sepal Lenght", ylab = "Value of Iris Sepal Width")
+```
