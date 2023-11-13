@@ -1,0 +1,216 @@
+---
+title: "Untitled"
+author: "Shreya Thodupunuri"
+date: "2023-11-12"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Loading the dataset
+Pharmaceuticals <- read.csv("C:/Users/shrey/OneDrive/Documents/Pharmaceuticals.csv")
+# Ensuring the file path is correct and the dataset is loaded properly.
+
+```
+
+
+```{r}
+
+# Reading required libraries for data manipulation and clustering
+library(tidyverse)
+library(factoextra)
+library(dplyr)
+library(ggplot2)
+library(cluster)
+# These libraries are essential for manipulating data and performing cluster analysis.
+
+```
+
+
+
+
+**Task1**
+
+kUse only the numerical variables (1 to 9) to cluster the 21 firms.
+Justify the various choices made in conducting the cluster analysis, such as weights for different variables,the specific clustering algorithm(s) used, the number of clusters formed, and so on.
+Removal of missing data helps in maintaining the accuracy of the cluster analysis.
+Prior to clustering data, remove the missing data and rescale variables for comparability.
+```{r}
+# Removing missing data and selecting relevant variables for cluster analysis
+Pharma_data <- na.omit(Pharmaceuticals) 
+# Removing incomplete cases to maintain the accuracy of the cluster analysis.
+
+```
+
+```{r}
+#Taking the quantitative variables(1-9) to cluster the 21 firms
+
+row.names(Pharma_data)<- Pharma_data[,1]
+Pharma_data1<- Pharma_data[,3:11]# Considering only numercial values i.e., 3-11 columns from csv file
+head(Pharma_data1)
+
+# Focusing on numerical variables (columns 3 to 11) as they are key for clustering.
+
+```
+
+```{r}
+
+
+#Normalizing the data frame with scale method
+
+Pharma_data2<-scale(Pharma_data1)
+head(Pharma_data2)
+# Scaling standardizes the data, making it suitable for clustering.
+
+```
+
+```{r}
+
+# Determining the number of clusters using Elbow Method
+
+fviz_nbclust(Pharma_data2, kmeans, method = "wss") 
+
+# The Elbow Method helps identify the optimal cluster count by analyzing within-cluster sum of squares.
+
+```
+
+```{r}
+##By seeing the above graph from Elbow method, Graph is not clear to choose k=2 or 3 or 4 or 5.
+# Using Silhouette method to determine the number of clusters
+
+fviz_nbclust(Pharma_data2, kmeans, method = "silhouette")
+
+
+```
+
+
+By seeing the graph from silhouette method, I can see sharp rise at k=5. 
+So, considering the  silhouette method.
+
+Silhouette method assesses how well each object lies within its cluster, aiding in determining the best number of clusters.
+
+
+```{r}
+# Performing K-means clustering
+set.seed(64060)
+k_5 <- kmeans(Pharma_data2, centers=5, nstart=25)
+
+```
+K-means clustering is performed with 5 clusters, determined by previous methods.
+
+
+
+```{r}
+# Visualizing cluster centroids and distances
+
+k_5$centers
+fviz_cluster(k_5,data = Pharma_data2) # to Visualize the clusters
+k_5
+distance<- dist(Pharma_data2, method = "euclidean")
+fviz_dist(distance)
+
+# I can see there are 5 clusters and the center is defined after 25 restarts which is determined in kmeans.
+```
+Visualization aids in understanding the distribution and separation of clusters.
+
+
+```{r}
+
+# Refitting K-means for a clearer interpretation
+#K-Means Cluster Analysis- Fit the data with 5 clusters
+
+fit<-kmeans(Pharma_data2,5)
+```
+
+
+```{r}
+
+# Analyzing the mean values of each variable within each cluster
+
+aggregate(Pharma_data2,by=list(fit$cluster),FUN=mean)
+
+Pharma_data3<-data.frame(Pharma_data2,fit$cluster)
+Pharma_data3
+View(Pharma_data3)
+
+```
+Aggregate functions reveal the central tendencies of each cluster, highlighting their defining characteristics.
+
+```{r}
+
+# Cluster plot visualization
+
+clusplot(Pharma_data2,fit$cluster,color = TRUE,shade = TRUE,labels = 2,lines = 0)
+```
+
+Clusplot visually represents the clustering, showing the grouping and outliers if any.
+
+
+
+**Task 2** 
+
+
+Interpret the clusters with respect to the numerical variables used in forming the clusters.
+
+By noticing the mean values of all quantitative variables for each cluster
+
+Cluster_1 - AGN, PHA, BAY - Suggests higher growth expectations or overvaluation.
+
+Cluster_2 - JNJ, MRK, GSK, PFE - High Market Cap and Leverage: Indicates large, established companies.
+
+Cluster_3 - AHM, AVE, WPI - Low Asset Turnover and Beta: Represents conservative, stable firms.
+
+Cluster_4 - IVX, MRX, ELN, CHTT - Low Market Capital but High Revenue Growth: Reflects emerging growth companies.
+
+Cluster_5 - ABT, NVS, AZN, LLY, BMY, WYE, SGP - Low Revenue Growth, High Asset Turnover, and Net Profit Margin: Signifies efficient, profitably run firms.
+
+
+
+
+
+**Task 3**
+
+
+Is there a pattern in the clusters with respect to the numerical variables (10 to 12)? (those not used in forming the clusters)
+
+
+For cluster 1: It  has the highest PE_Ratio and needs to be held as per the media recommendations.
+
+For cluster 2: It has the highest market_Cap and has Good Leverage value. And they can be moderately recommended.
+
+For cluster 3: It has lowest asset_turnover,and lowest beta. But media recommendations are highly positive.
+
+For cluster 4: The leverage ratio is high, they are moderately recommended. 
+
+For Cluster 5: They have lowest revenue growth, highest assest turnover and highest net profit margin.
+
+They are  recommended to be held for longer time.
+
+
+
+
+
+**Task 4**
+
+Provide an appropriate name for each cluster using any or all of the variables in the dataset.
+
+
+Cluster 1 - Balanced Performers: This name suggests that firms in this cluster have stable and decent financial metrics. It implies a balanced performance across various financial aspects.
+
+Cluster 2 - Steady Growth Contenders: This name indicates that companies in this cluster demonstrate consistent growth, making them a moderate but reliable option for investment or holding. It reflects both stability and potential for growth.
+
+Cluster 3 - Dynamic Opportunity Firms: This name implies that firms in this cluster might present varied investment opportunities, characterized by both potential growth (buy) and higher risk (sell). It suggests dynamism and variability in performance.
+
+Cluster 4 - Stable Investment Picks: This name reflects firms with good stability and solid financial metrics, making them attractive for buying and long-term investment.
+
+Cluster 5 - Long-term Value Holders: This name suggests that firms in this cluster are ideal for holding due to their potential to provide long-term value, likely characterized by lower but consistent revenue growth and high asset turnover.
+
+
+
+
